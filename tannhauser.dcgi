@@ -1,0 +1,106 @@
+#!/bin/sh
+# A basic gopher-gemini gateway
+# Dependencies:
+# - nmap: ncat, to make a Gemini request. There should be a way to do this
+#         with open/libre ssl and ordinary netcat.
+# - Gemyidae: A Gopher server. I don't know whether or not its CGI system
+#             is standard.
+
+# Geomyidae CGI command line:
+search="$1"
+arguments="$2"
+host="$3"
+port="$4"
+
+case "$arguments" in
+    "astrogate")     # gopher://localhost:70/7/tannhauser.dcgi?astrogate/$search
+        # TODO: urlencode utf-8 and stuff
+        search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
+        query_url="gemini://$search/"
+        query_host="$(echo "$search" | awk -F'/' '{print $1}')"
+        printf "DBG: Astrogating to: %s\n" "$search"
+    ;;
+
+    "gus")           # gopher://localhost:70/7/tannhauser.dcgi?gus/$search
+        # TODO: urlencode utf-8 and stuff
+        # FIXME: the server returns nothing
+        search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
+        query_url="gemini://gus.guru/search?$search"
+        query_host="gus.guru"
+        printf "DBG: Searching GUS for: %s\nurl: %s\n" "$search" "$query_url"
+    ;;
+    "houston")       # gopher://localhost:70/7/tannhauser.dcgi?houston/$search
+        # TODO: urlencode utf-8 and stuff
+        search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
+        query_url="gemini://houston.coder.town/search?$search"
+        query_host="houston.coder.town"
+        printf "DBG: Searching Houston for: %s\n" "$search"
+    ;;
+
+    "capcom")        # gopher://localhost:70/1/tannhauser.dcgi?capcom
+        query_url="gemini://gemini.circumlunar.space/capcom/"
+        query_host="gemini.circumlunar.space"
+        echo "DBG: Loading the CAPCOM aggregator"
+    ;;
+    "spacewalk")     # gopher://localhost:70/1/tannhauser.dcgi?spacewalk
+        query_url="gemini://rawtext.club/~sloum/spacewalk.gmi"
+        query_host="rawtext.club"
+        echo "DBG: Loading the Spacewalk aggregator"
+    ;;
+
+    "gemini")        # gopher://tanhauser.lagrangian.space:70/1/tannhauser.dcgi?gemini
+        # FIXME: sanitize for tabs
+        query_url="gemini://gemini.circumlunar.space/"
+        query_host="gemini.circumlunar.space"
+        echo "DBG: Loading Project Gemini"
+    ;;
+    "*")
+        echo "Error, don't understand the argument:"
+        echo "$arguments"
+        echo "search: $search"
+        exit 1
+    ;;
+esac
+
+if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
+    printf "%s\r\n" "$query_url" | ncat --ssl "$query_host" 1965 | \
+        sed "s/\t/ /g" | \
+        awk -F' ' '{
+                        if ($1 == "=>") {
+                            if (substr($2, 0, 7) == "gemini:") {
+                                #printf "GEMINI_LINK => "
+                                printf "[1|" 
+                                for (i = 3; i <= NF; i++)
+                                    printf $i " "
+                                # TODO: strip gemini:// from $2
+                                printf "|tannhauser.dcgi?astrogate/" $2 \
+                                    "|localhost|70]\n"
+                                #printf " (" $2 ")\n"
+                            } else if (!substr($2, 0, index($2, ":"))) {
+                                #printf "GEMINI_PATH => "
+                                # TODO: prepend /
+                                printf "[1|" 
+                                for (i = 3; i <= NF; i++)
+                                    printf $i " "
+                                # TODO: cat domain with the path
+                                printf "|tannhauser.dcgi?astrogate/" $2 \
+                                    "|localhost|70]\n"
+                                #printf " (" $2 ")\n"
+                            } else {
+                                #printf "NORMAL_LINK => "
+                                if (substr($2, 0, 4) == "http")
+                                    printf "[h|"
+                                for (i = 3; i <= NF; i++)
+                                    printf $i " "
+                                printf "|URL:" $2 "|localhost|70]\n"
+                                #printf " (" $2 ")\n"
+                            }
+                        } else {
+                            print $0
+                        }
+                    }' || exit 1
+else
+    exit 1
+fi
+
+exit 0
