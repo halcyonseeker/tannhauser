@@ -3,8 +3,8 @@
 # Dependencies:
 # - nmap: ncat, to make a Gemini request. There should be a way to do this
 #         with open/libre ssl and ordinary netcat.
-# - Gemyidae: A Gopher server. I don't know whether or not its CGI system
-#             is standard.
+# - Geomyidae: A Gopher server. I don't know whether or not its CGI system
+#              is standard.
 
 # Geomyidae CGI command line:
 search="$1"
@@ -12,6 +12,9 @@ arguments="$2"
 host="$3"
 port="$4"
 
+# FUCK: It looks like geomyidae only sets $search with selector 7 (search)
+#       links. If I'm correct then the "astrogation" functionality of this
+#       gateway is impossible without this server.
 case "$arguments" in
     "astrogate")     # gopher://localhost:70/7/tannhauser.dcgi?astrogate/$search
         # TODO: urlencode utf-8 and stuff
@@ -22,7 +25,9 @@ case "$arguments" in
 
     "gus")           # gopher://localhost:70/7/tannhauser.dcgi?gus/$search
         # TODO: urlencode utf-8 and stuff
-        # FIXME: the server returns nothing, $status (head -1) is empty
+        # FIXME: The server returns nothing, $status (head -1) is empty.
+        #        This may be because the printf | ncat line that we use
+        #        to fetch gemini pages doesn't properly conform to the spec
         search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
         query_url="gemini://gus.guru/search?$search"
         query_host="gus.guru"
@@ -89,7 +94,9 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
             *)
                 # TODO: differentiate between text for display and binary to dl
                 printf "DBG: \$mime (%s) is something else\n" "$mime"
-                sed "1 d" /tmp/tannhauser.req
+                # NOTE: This is temporary until I fix the above bug
+                #sed "1 d" /tmp/tannhauser.req
+                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req | ./gmi2gph.awk
             ;;
         esac
     else
