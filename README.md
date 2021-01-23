@@ -7,21 +7,21 @@ be accessed from any gopher browser.
 
 [gopher://tannhauser.lagrangian.space](gopher://tannhauser.lagrangian.space)
 
-Since M$ Github doesn't hyperlink gopher:// urls, here's a
+Since M$ Github doesn't hyperlink gopher urls, here's a
 [floodgap link](https://gopher.floodgap.com/gopher/gw.lite?gopher://tannhauser.lagrangian.space:70/1)
 
-# Dependencies
+## Dependencies
 + nmap, for ncat 
 + geomyidae
 
-# Bugs
+## Bugs
 + **Geomyidae only sets search for selector 7**. This is really bad,
   as it means that the "astrogation" functionality that is this
   program's raison d'etre is impossible. I'll look into different
   servers (Gophernicus, etc) and the Gopher spec (RFC 1436) to see if
   there's a way around it. If not I'll probably have to shove this
   script into a minimal Gopher server.
-+ **`printf | ncat` doesn't work with gus.guru**. The server doesn't
++ **printf | ncat doesn't work with gus.guru**. The server doesn't
   return anything and the program dies with `$status`, which should be
   something like `20 text/gemini`, unset. I think `printf | ncat`
   doesn't properly adhere to the Gemini spec.
@@ -31,7 +31,7 @@ Since M$ Github doesn't hyperlink gopher:// urls, here's a
 + **Broken hyperlink-generator**. gmi2gph.awk produces broken gopher
   and http(s) hyperlinks, learn more about AWK and fix them.
 
-# TODO
+## TODO
 + Figure out a portable way to removing nmap as a dependency.
 + Investigate making this script server-agnostic.
 + We might have to URL-encode the query URL. Should be easy with AWK.
