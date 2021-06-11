@@ -25,10 +25,12 @@ BEGIN {
 
             } else if ((substr($2, 0, 5) == "http:") || \
                        (substr($2, 0, 6) == "https:")) {  # Web Link
-                # FIXME: this is being mangled for some reason
                 printf "[h|"
-                for (i = 3; i <= NF; i++)
-                    printf $i " "
+                if (NF == 2)
+                    printf $2
+                else
+                    for (i = 3; i <= NF; i++)
+                        printf $i " "
                 printf "|URL:" $2 "|localhost|70]\n"
 
             } else {                                      # Unspecified link
