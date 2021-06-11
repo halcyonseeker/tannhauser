@@ -36,8 +36,11 @@ else
     print_debug
 fi
 
+# ncat doesn't like host:port URIs
+query_host="${query_host%%:1965}"
+
 if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
-    printf "%s\r\n" "$query_url" |  ncat --ssl "$query_host" 1965 >/tmp/astrogate || {
+    printf "%s\r\n\r\n" "$query_url" |  ncat --ssl "$query_host" 1965 >/tmp/astrogate || {
         printf "Request Error: Failed to reach remote host\n"
         print_debug
         rm -f /tmp/astrogate
