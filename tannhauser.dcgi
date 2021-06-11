@@ -6,12 +6,24 @@
 # - Geomyidae: A Gopher server. I don't know whether or not its CGI system
 #              is standard.
 
-# Geomyidae CGI command line:
+# Geomyidae CGI command line
 search="$1"
 arguments="$2"
 host="$3"
 port="$4"
 
+# Needed to send the request and assemble working links
+if [ -n "$arguments" ]; then
+    query_url="gemini://$(echo "$arguments" | cut -d '?' -f2)"
+    query_host="$(echo "$query_url" | cut -d '/' -f3)"
+else
+    printf "CGI Error: \$search and \$arguments are empty\n"
+    printf "I haven't implemented selector 7 yet\n"
+    printf "(1) \$search    : %s\n" "$search"
+    printf "(2) \$arguments : %s\n" "$arguments"
+    printf "(3) \$host      : %s\n" "$host"
+    printf "(4) \$port      : %s\n" "$port"
+fi
 
 if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
     # TODO it might be better to use a named fd instead of a temp file
