@@ -14,6 +14,7 @@ print_debug() {
     [ -n "$port" ]      && printf "| (4) \$port      : %s\n" "$port"
     [ -n "$url" ]       && printf "| \$url           : %s\n" "$url"
     [ -n "$host" ]      && printf "| \$host          : %s\n" "$host"
+    [ -n "$path" ]      && printf "| \$path          : %s\n" "$path"
     [ -n "$status" ]    && printf "| \$status        : %s\n" "$status"
     [ -n "$code" ]      && printf "| \$code          : %s\n" "$code"
     [ -n "$mime" ]      && printf "| \$mime          : %s\n" "$mime"
@@ -49,6 +50,7 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
     status="$(head -1 /tmp/astrogate)"
     code="$(echo "$status" | cut -d ' ' -f1)"
     mime="$(echo "$status" | cut -d ' ' -f2 | tr -d ';')"
+    path="${url##gemini:\/\/}"
 
     [ -z "$status" ] && {
         printf "CGI Error: gemini response (\$status line) is empty\n"
@@ -60,7 +62,6 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
     print_debug
 
     if [ "$code" = "20" ] ; then  # Everything is okay
-        path="${url##gemini:\/\/}"
         case "$mime" in
             "text/gemini")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
