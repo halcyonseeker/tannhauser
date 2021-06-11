@@ -18,10 +18,20 @@ BEGIN {
                 printf "|/tannhauser.dcgi?" path $2 "|localhost|70]\n"
 
             } else if (substr($2, 0, 7) == "gopher:") {   # Gopher Link
-                printf "GOPHER_LINK => "
-                for (i = 3; i <= NF; i++)
-                    printf $i " "
-                printf " (" $2 ")\n"
+                sub(/gopher:\/\//, "", $2)
+                gphhost = substr($2, 0, index($2, ":") - 1)
+                gphport = substr($2, index($2, ":") + 1, length(index($2, "/") - 1))
+                gphselector = substr($2, index($2, "/") + 1, 1)
+                gphpath = substr($2, index($2, "/") + 2)
+
+                printf "[" gphselector "|"
+                if (NF == 2)
+                    printf $2
+                else
+                    for (i = 3; i <= NF; i++)
+                        printf $i " "
+                printf "|" gphpath "|" gphhost "|" gphport "]\n"
+
 
             } else if ((substr($2, 0, 5) == "http:") || \
                        (substr($2, 0, 6) == "https:")) {  # Web Link
