@@ -6,6 +6,20 @@
 # - Geomyidae: A Gopher server. I don't know whether or not its CGI system
 #              is standard.
 
+print_debug() {
+    printf "+----------------+-----------------------------------------+\n"
+    [ -n "$search" ]     && printf "| (1) \$search    : %s\n" "$search"
+    [ -n "$arguments" ]  && printf "| (2) \$arguments : %s\n" "$arguments"
+    [ -n "$host" ]       && printf "| (3) \$host      : %s\n" "$host"
+    [ -n "$port" ]       && printf "| (4) \$port      : %s\n" "$port"
+    [ -n "$query_url" ]  && printf "| \$query_url     : %s\n" "$query_url"
+    [ -n "$query_host" ] && printf "| \$query_host    : %s\n" "$query_host"
+    [ -n "$status" ]     && printf "| \$status        : %s\n" "$status"
+    [ -n "$code" ]       && printf "| \$code          : %s\n" "$code"
+    [ -n "$mime" ]       && printf "| \$mime          : %s\n" "$mime"
+    printf "+----------------+-----------------------------------------+\n"
+}
+
 # Geomyidae CGI command line
 search="$1"
 arguments="$2"
@@ -19,23 +33,13 @@ if [ -n "$arguments" ]; then
 else
     printf "CGI Error: \$search and \$arguments are empty\n"
     printf "I haven't implemented selector 7 yet\n"
-    printf "(1) \$search    : %s\n" "$search"
-    printf "(2) \$arguments : %s\n" "$arguments"
-    printf "(3) \$host      : %s\n" "$host"
-    printf "(4) \$port      : %s\n" "$port"
+    print_debug
 fi
 
 if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
     printf "%s\r\n" "$query_url" |  ncat --ssl "$query_host" 1965 >/tmp/astrogate || {
         printf "Request Error: Failed to reach remote host\n"
-        printf "+----------------+-----------------------------------------+\n"
-        printf "| (1) \$search    : %s\n" "$search"
-        printf "| (2) \$arguments : %s\n" "$arguments"
-        printf "| (3) \$host      : %s\n" "$host"
-        printf "| (4) \$port      : %s\n" "$port"
-        printf "| \$query_url     : %s\n" "$query_url"
-        printf "| \$query_host    : %s\n" "$query_host"
-        printf "+----------------+-----------------------------------------+\n"
+        print_debug
         rm -f /tmp/astrogate
     }
 
@@ -45,17 +49,12 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
 
     [ -z "$status" ] && {
         printf "CGI Error: gemini response (\$status line) is empty\n"
-        printf "+----------------+-----------------------------------------+\n"
-        printf "| (1) \$search    : %s\n" "$search"
-        printf "| (2) \$arguments : %s\n" "$arguments"
-        printf "| (3) \$host      : %s\n" "$host"
-        printf "| (4) \$port      : %s\n" "$port"
-        printf "| \$query_url     : %s\n" "$query_url"
-        printf "| \$query_host    : %s\n" "$query_host"
-        printf "+----------------+-----------------------------------------+\n"
+        print_debug
         rm -f /tmp/astrogate
         exit 1
     }
+
+    print_debug
 
     if [ "$code" = "20" ] ; then  # Everything is okay
         path="${query_url##gemini:\/\/}"
@@ -76,17 +75,7 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
         esac
     else
         printf "Gemini Error: %s\n" "$status"
-        printf "+----------------+-----------------------------------------+\n"
-        printf "| (1) \$search    : %s\n" "$search"
-        printf "| (2) \$arguments : %s\n" "$arguments"
-        printf "| (3) \$host      : %s\n" "$host"
-        printf "| (4) \$port      : %s\n" "$port"
-        printf "| \$query_url     : %s\n" "$query_url"
-        printf "| \$query_host    : %s\n" "$query_host"
-        printf "| \$status        : %s\n" "$status"
-        printf "| \$code          : %s\n" "$code"
-        printf "| \$mime          : %s\n" "$mime"
-        printf "+----------------+-----------------------------------------+\n"
+        print_debug
         rm -f /tmp/astrogate
         exit 1
     fi
@@ -94,14 +83,7 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
     rm -f /tmp/astrogate
 else
     printf "CGI error: \$query_url and/or \$query_host are empty\n"
-    printf "+----------------+-----------------------------------------+\n"
-    printf "| (1) \$search    : %s\n" "$search"
-    printf "| (2) \$arguments : %s\n" "$arguments"
-    printf "| (3) \$host      : %s\n" "$host"
-    printf "| (4) \$port      : %s\n" "$port"
-    printf "| \$query_url     : %s\n" "$query_url"
-    printf "| \$query_host    : %s\n" "$query_host"
-    printf "+----------------+-----------------------------------------+\n"
+    print_debug
     exit 1
 fi
 
