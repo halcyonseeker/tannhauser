@@ -9,16 +9,15 @@
       A Gemini proxy in Gopherspace
 
 === A S T R O G A T E
-[7|Go to a Gemini URL|/tannhauser.dcgi?astrogate|localhost|70]
+[7|Go to a Gemini URL|/tannhauser.dcgi|localhost|70]
 
 === S E A R C H   E N G I N E S
-[7|Search GUS|/tannhauser.dcgi?gus|localhost|70]
-[7|Search Houston|/tannhauser.dcgi?houston|localhost|70]
+[1|Gemini Search Engine|/tannhauser.dcgi?geminispace.info/|localhost|70]
 
 === A G G R E G A T O R S
-[1|CAPCOM Feed Aggregator|/tannhauser.dcgi?capcom|localhost|70]
-[1|Spacewalk Aggregator|/tannhauser.dcgi?spacewalk|localhost|70]
+[1|CAPCOM Feed Aggregator|/tannhauser.dcgi?gemini.circumlunar.space/capcom/|localhost|70]
+[1|Spacewalk Aggregator|/tannhauser.dcgi?rawtext.club/~sloum/spacewalk.gmi|localhost|70]
 
 === M E T A
-[1|Project Gemini|/tannhauser.dcgi?gemini|localhost|70]
+[1|Project Gemini|/tannhauser.dcgi?gemini.circumlunar.space/|localhost|70]
 [h|Tannhauser Source|URL:https://git.sr.ht/~thalia/tannhauser|localhost|70]
