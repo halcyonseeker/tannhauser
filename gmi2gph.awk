@@ -18,19 +18,10 @@ BEGIN {
                 printf "|/tannhauser.dcgi?" path $2 "|localhost|70]\n"
 
             } else if (substr($2, 0, 7) == "gopher:") {   # Gopher Link
-                # FIXME: this produces mangled links
-                sub(/gopher:\/\//, "", $2) # Strip protocol
-                domain = substr($2, 0, index($2, ":"))
-                sub(/:/, "", $2)           # Strip host
-                port = substr($2, 0, index($2, "/"))
-                sub(/\//, "", $2)          # Strip port
-                selector = substr($2, 0, index($2, "/"))
-                sub(/\//, "", $2)          # Strip selector
-                path = "/" $2
-                printf "[" $selector "|"
+                printf "GOPHER_LINK => "
                 for (i = 3; i <= NF; i++)
                     printf $i " "
-                printf "|" $path "|" $domain "|" $port "]\n"
+                printf " (" $2 ")\n"
 
             } else if ((substr($2, 0, 5) == "http:") || \
                        (substr($2, 0, 6) == "https:")) {  # Web Link
