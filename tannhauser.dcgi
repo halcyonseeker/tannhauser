@@ -12,53 +12,6 @@ arguments="$2"
 host="$3"
 port="$4"
 
-# FUCK: It looks like geomyidae only sets $search with selector 7 (search)
-#       links. If I'm correct then the "astrogation" functionality of this
-#       gateway is impossible without this server.
-case "$arguments" in
-    "astrogate")     # gopher://localhost:70/7/tannhauser.dcgi?astrogate/$search
-        # TODO: urlencode utf-8 and stuff
-        search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
-        query_url="gemini://$search/"
-        query_host="$(echo "$search" | awk -F'/' '{print $1}')"
-    ;;
-
-    "gus")           # gopher://localhost:70/7/tannhauser.dcgi?gus/$search
-        # TODO: urlencode utf-8 and stuff
-        # FIXME: The server returns nothing, $status (head -1) is empty.
-        #        This may be because the printf | ncat line that we use
-        #        to fetch gemini pages doesn't properly conform to the spec
-        search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
-        query_url="gemini://gus.guru/search?$search"
-        query_host="gus.guru"
-    ;;
-    "houston")       # gopher://localhost:70/7/tannhauser.dcgi?houston/$search
-        # TODO: urlencode utf-8 and stuff
-        search="$(echo "$search" | sed "s/\t/%09/g; s/ /%20/g")"
-        query_url="gemini://houston.coder.town/search?$search"
-        query_host="houston.coder.town"
-    ;;
-
-    "capcom")        # gopher://localhost:70/1/tannhauser.dcgi?capcom
-        query_url="gemini://gemini.circumlunar.space/capcom/"
-        query_host="gemini.circumlunar.space"
-    ;;
-    "spacewalk")     # gopher://localhost:70/1/tannhauser.dcgi?spacewalk
-        query_url="gemini://rawtext.club/~sloum/spacewalk.gmi"
-        query_host="rawtext.club"
-    ;;
-
-    "gemini")        # gopher://tanhauser.lagrangian.space:70/1/tannhauser.dcgi?gemini
-        query_url="gemini://gemini.circumlunar.space/"
-        query_host="gemini.circumlunar.space"
-    ;;
-    *)
-        printf "Error, I don't understand the argument:\n"
-        printf "Argument: %s\n" "$arguments"
-        printf "Search: %s\n" "$search"
-        exit 1
-    ;;
-esac
 
 if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
     # TODO it might be better to use a named fd instead of a temp file
