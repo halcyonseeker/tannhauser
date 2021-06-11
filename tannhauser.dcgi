@@ -85,7 +85,8 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
         case "$mime" in
             "text/gemini")
                 printf "DBG: \$mime (%s) is text/gemini\n" "$mime"
-                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req | ./gmi2gph.awk
+                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req \
+                    | awk -v host="$query_host" -f ./gmi2gph.awk
             ;;
             "text/plain")
                 printf "DBG: \$mime (%s) is text/plain\n" "$mime"
@@ -96,7 +97,8 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
                 printf "DBG: \$mime (%s) is something else\n" "$mime"
                 # NOTE: This is temporary until I fix the above bug
                 #sed "1 d" /tmp/tannhauser.req
-                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req | ./gmi2gph.awk
+                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req \
+                    | awk -v host="$query_host" -f ./gmi2gph.awk
             ;;
         esac
     else
