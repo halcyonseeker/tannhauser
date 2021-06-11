@@ -26,56 +26,82 @@ else
 fi
 
 if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
-    # TODO it might be better to use a named fd instead of a temp file
-    printf "%s\r\n" "$query_url" | ncat --ssl "$query_host" 1965 \
-                                        >/tmp/tannhauser.req
+    printf "%s\r\n" "$query_url" |  ncat --ssl "$query_host" 1965 >/tmp/astrogate || {
+        printf "Request Error: Failed to reach remote host\n"
+        printf "+----------------+-----------------------------------------+\n"
+        printf "| (1) \$search    : %s\n" "$search"
+        printf "| (2) \$arguments : %s\n" "$arguments"
+        printf "| (3) \$host      : %s\n" "$host"
+        printf "| (4) \$port      : %s\n" "$port"
+        printf "| \$query_url     : %s\n" "$query_url"
+        printf "| \$query_host    : %s\n" "$query_host"
+        printf "+----------------+-----------------------------------------+\n"
+        rm -f /tmp/astrogate
+    }
 
-    status="$(head -1 /tmp/tannhauser.req)"
+    status="$(head -1 /tmp/astrogate)"
     code="$(echo "$status" | cut -d ' ' -f1)"
     mime="$(echo "$status" | cut -d ' ' -f2 | tr -d ';')"
 
     [ -z "$status" ] && {
         printf "CGI Error: gemini response (\$status line) is empty\n"
+        printf "+----------------+-----------------------------------------+\n"
+        printf "| (1) \$search    : %s\n" "$search"
+        printf "| (2) \$arguments : %s\n" "$arguments"
+        printf "| (3) \$host      : %s\n" "$host"
+        printf "| (4) \$port      : %s\n" "$port"
+        printf "| \$query_url     : %s\n" "$query_url"
+        printf "| \$query_host    : %s\n" "$query_host"
+        printf "+----------------+-----------------------------------------+\n"
+        rm -f /tmp/astrogate
         exit 1
     }
 
-    printf "DBG: %s\n" "$status"
-
     if [ "$code" = "20" ] ; then  # Everything is okay
-        # FIXME: case usually reaches *, even when $mime = "text/gemini"
-        # Some testing indicates that some gemini capsules (eg, gopher.black
-        # and kvothe.one) reach text/gemini. I believe this may be due to
-        # inconsistently designed servers. Possibly a matter of the text
-        # encoding of the $status line ?????
+        path="${query_url##gemini:\/\/}"
         case "$mime" in
             "text/gemini")
-                printf "DBG: \$mime (%s) is text/gemini\n" "$mime"
-                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req \
-                    | awk -v host="$query_host" -f ./gmi2gph.awk
+                sed "s/\t/ /g; 1 d" /tmp/astrogate \
+                    | awk -v path="$path" -v host="$query_host" -f ./gmi2gph.awk
             ;;
             "text/plain")
-                printf "DBG: \$mime (%s) is text/plain\n" "$mime"
-                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req
+                sed "s/\t/ /g; 1 d" /tmp/astrogate
             ;;
             *)
                 # TODO: differentiate between text for display and binary to dl
-                printf "DBG: \$mime (%s) is something else\n" "$mime"
-                # NOTE: This is temporary until I fix the above bug
-                #sed "1 d" /tmp/tannhauser.req
-                sed "s/\t/ /g; 1 d" /tmp/tannhauser.req \
-                    | awk -v host="$query_host" -f ./gmi2gph.awk
+                printf "WARNING: \$mime (%s) is something else\n" "$mime"
+                sed "s/\t/ /g; 1 d" /tmp/astrogate \
+                    | awk -v path="$path" -v host="$query_host" -f ./gmi2gph.awk
             ;;
         esac
     else
-        printf "Gemini Error:\n%s" "$status"
+        printf "Gemini Error: %s\n" "$status"
+        printf "+----------------+-----------------------------------------+\n"
+        printf "| (1) \$search    : %s\n" "$search"
+        printf "| (2) \$arguments : %s\n" "$arguments"
+        printf "| (3) \$host      : %s\n" "$host"
+        printf "| (4) \$port      : %s\n" "$port"
+        printf "| \$query_url     : %s\n" "$query_url"
+        printf "| \$query_host    : %s\n" "$query_host"
+        printf "| \$status        : %s\n" "$status"
+        printf "| \$code          : %s\n" "$code"
+        printf "| \$mime          : %s\n" "$mime"
+        printf "+----------------+-----------------------------------------+\n"
+        rm -f /tmp/astrogate
         exit 1
     fi
 
-    rm -f /tmp/tannhauser.req
+    rm -f /tmp/astrogate
 else
     printf "CGI error: \$query_url and/or \$query_host are empty\n"
-    printf "\$query_url: %s\n" "$query_url"
-    printf "\$query_host: %s\n" "$query_host"
+    printf "+----------------+-----------------------------------------+\n"
+    printf "| (1) \$search    : %s\n" "$search"
+    printf "| (2) \$arguments : %s\n" "$arguments"
+    printf "| (3) \$host      : %s\n" "$host"
+    printf "| (4) \$port      : %s\n" "$port"
+    printf "| \$query_url     : %s\n" "$query_url"
+    printf "| \$query_host    : %s\n" "$query_host"
+    printf "+----------------+-----------------------------------------+\n"
     exit 1
 fi
 

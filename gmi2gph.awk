@@ -9,13 +9,13 @@ BEGIN {
                 printf "[1|"
                 for (i = 3; i <= NF; i++)
                     printf $i " "
-                printf "|/tannhauser.dcgi?astrogate/" host "/" $2 "|localhost|70]\n"
+                printf "|/tannhauser.dcgi?" $2 "|localhost|70]\n"
 
             } else if (!substr($2, 0, index($2, ":"))) {  # Gemini Path
                 printf "[1|"
                 for (i = 3; i <= NF; i++)
                     printf $i " "
-                printf "|/tannhauser.dcgi?astrogate/" host "/" $2 "|localhost|70]\n"
+                printf "|/tannhauser.dcgi?" path $2 "|localhost|70]\n"
 
             } else if (substr($2, 0, 7) == "gopher:") {   # Gopher Link
                 # FIXME: this produces mangled links
