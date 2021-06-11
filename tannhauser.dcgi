@@ -8,15 +8,15 @@
 
 print_debug() {
     printf "+----------------+-----------------------------------------+\n"
-    [ -n "$search" ]     && printf "| (1) \$search    : %s\n" "$search"
-    [ -n "$arguments" ]  && printf "| (2) \$arguments : %s\n" "$arguments"
-    [ -n "$host" ]       && printf "| (3) \$host      : %s\n" "$host"
-    [ -n "$port" ]       && printf "| (4) \$port      : %s\n" "$port"
-    [ -n "$query_url" ]  && printf "| \$query_url     : %s\n" "$query_url"
-    [ -n "$query_host" ] && printf "| \$query_host    : %s\n" "$query_host"
-    [ -n "$status" ]     && printf "| \$status        : %s\n" "$status"
-    [ -n "$code" ]       && printf "| \$code          : %s\n" "$code"
-    [ -n "$mime" ]       && printf "| \$mime          : %s\n" "$mime"
+    [ -n "$search" ]    && printf "| (1) \$search    : %s\n" "$search"
+    [ -n "$arguments" ] && printf "| (2) \$arguments : %s\n" "$arguments"
+    [ -n "$host" ]      && printf "| (3) \$host      : %s\n" "$host"
+    [ -n "$port" ]      && printf "| (4) \$port      : %s\n" "$port"
+    [ -n "$url" ]       && printf "| \$url           : %s\n" "$url"
+    [ -n "$host" ]      && printf "| \$host          : %s\n" "$host"
+    [ -n "$status" ]    && printf "| \$status        : %s\n" "$status"
+    [ -n "$code" ]      && printf "| \$code          : %s\n" "$code"
+    [ -n "$mime" ]      && printf "| \$mime          : %s\n" "$mime"
     printf "+----------------+-----------------------------------------+\n"
 }
 
@@ -28,8 +28,8 @@ port="$4"
 
 # Needed to send the request and assemble working links
 if [ -n "$arguments" ]; then
-    query_url="gemini://$(echo "$arguments" | cut -d '?' -f2)"
-    query_host="$(echo "$query_url" | cut -d '/' -f3)"
+    url="gemini://$(echo "$arguments" | cut -d '?' -f2)"
+    host="$(echo "$url" | cut -d '/' -f3)"
 else
     printf "CGI Error: \$search and \$arguments are empty\n"
     printf "I haven't implemented selector 7 yet\n"
@@ -37,10 +37,10 @@ else
 fi
 
 # ncat doesn't like host:port URIs
-query_host="${query_host%%:1965}"
+host="${host%%:1965}"
 
-if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
-    printf "%s\r\n\r\n" "$query_url" |  ncat --ssl "$query_host" 1965 >/tmp/astrogate || {
+if [ -n "$url" ] && [ -n "$host" ] ; then
+    printf "%s\r\n\r\n" "$url" |  ncat --ssl "$host" 1965 >/tmp/astrogate || {
         printf "Request Error: Failed to reach remote host\n"
         print_debug
         rm -f /tmp/astrogate
@@ -60,11 +60,11 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
     print_debug
 
     if [ "$code" = "20" ] ; then  # Everything is okay
-        path="${query_url##gemini:\/\/}"
+        path="${url##gemini:\/\/}"
         case "$mime" in
             "text/gemini")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
-                    | awk -v path="$path" -v host="$query_host" -f ./gmi2gph.awk
+                    | awk -v path="$path" -v host="$host" -f ./gmi2gph.awk
             ;;
             "text/plain")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate
@@ -73,7 +73,7 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
                 # TODO: differentiate between text for display and binary to dl
                 printf "WARNING: \$mime (%s) is something else\n" "$mime"
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
-                    | awk -v path="$path" -v host="$query_host" -f ./gmi2gph.awk
+                    | awk -v path="$path" -v host="$host" -f ./gmi2gph.awk
             ;;
         esac
     else
@@ -85,7 +85,7 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
 
     rm -f /tmp/astrogate
 else
-    printf "CGI error: \$query_url and/or \$query_host are empty\n"
+    printf "CGI error: \$url and/or \$host are empty\n"
     print_debug
     exit 1
 fi
