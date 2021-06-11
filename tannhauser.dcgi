@@ -109,6 +109,8 @@ if [ -n "$query_url" ] && [ -n "$query_host" ] ; then
     rm -f /tmp/tannhauser.req
 else
     printf "CGI error: \$query_url and/or \$query_host are empty\n"
+    printf "\$query_url: %s\n" "$query_url"
+    printf "\$query_host: %s\n" "$query_host"
     exit 1
 fi
 
