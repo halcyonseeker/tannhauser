@@ -23,7 +23,7 @@ print_debug() {
 
 # Geomyidae CGI command line
 cgisearch="$1"
-cgicgiargs="$2"
+cgiargs="$2"
 cgihost="$3"
 cgiport="$4"
 
