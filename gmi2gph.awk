@@ -6,16 +6,16 @@ BEGIN {
         if ($1 == "=>") {                        # This line is a hyperlink
             if (substr($2, 0, 7) == "gemini:") {          # Gemini Link
                 sub(/gemini:\/\//, "", $2)
-                printf "[1|"
+                printf("[1|")
                 for (i = 3; i <= NF; i++)
-                    printf $i " "
-                printf "|/tannhauser.dcgi?" $2 "|localhost|70]\n"
+                    printf("%s ", $i)
+                printf("|/tannhauser.dcgi?%s|localhost|70]\n", $2)
 
             } else if (!substr($2, 0, index($2, ":"))) {  # Gemini Path
-                printf "[1|"
+                printf("[1|")
                 for (i = 3; i <= NF; i++)
-                    printf $i " "
-                printf "|/tannhauser.dcgi?" path $2 "|localhost|70]\n"
+                    printf("%s ", $i)
+                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", path, $2)
 
             } else if (substr($2, 0, 7) == "gopher:") {   # Gopher Link
                 sub(/gopher:\/\//, "", $2)
@@ -24,24 +24,23 @@ BEGIN {
                 gphselector = substr($2, index($2, "/") + 1, 1)
                 gphpath = substr($2, index($2, "/") + 2)
 
-                printf "[" gphselector "|"
+                printf("[%s|", gphselector)
                 if (NF == 2)
-                    printf $2
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
-                        printf $i " "
-                printf "|" gphpath "|" gphhost "|" gphport "]\n"
-
+                        printf("%s ", $i)
+                printf("|%s|%s|%s]\n", gphpath, gphhost, gphport)
 
             } else if ((substr($2, 0, 5) == "http:") || \
                        (substr($2, 0, 6) == "https:")) {  # Web Link
-                printf "[h|"
+                printf("[h|")
                 if (NF == 2)
-                    printf $2
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
-                        printf $i " "
-                printf "|URL:" $2 "|localhost|70]\n"
+                        printf("%s ", $i)
+                printf("|URL:%s|localhost|70]\n", $2)
 
             } else {                                      # Unspecified link
                 # TODO: what should we assume?
