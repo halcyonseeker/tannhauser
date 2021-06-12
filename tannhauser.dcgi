@@ -8,8 +8,8 @@
 
 print_debug() {
     printf "+----------------+-----------------------------------------+\n"
-    [ -n "$search" ]    && printf "| (1) \$search    : %s\n" "$search"
-    [ -n "$arguments" ] && printf "| (2) \$arguments : %s\n" "$arguments"
+    [ -n "$cgisearch" ] && printf "| (1) \$cgisearch : %s\n" "$cgisearch"
+    [ -n "$cgiargs" ]   && printf "| (2) \$cgiargs   : %s\n" "$cgiargs"
     [ -n "$host" ]      && printf "| (3) \$host      : %s\n" "$host"
     [ -n "$port" ]      && printf "| (4) \$port      : %s\n" "$port"
     [ -n "$url" ]       && printf "| \$url           : %s\n" "$url"
@@ -22,18 +22,17 @@ print_debug() {
 }
 
 # Geomyidae CGI command line
-search="$1"
-arguments="$2"
-host="$3"
-port="$4"
+cgisearch="$1"
+cgicgiargs="$2"
+cgihost="$3"
+cgiport="$4"
 
 # Needed to send the request and assemble working links
-if [ -n "$arguments" ]; then
-    url="gemini://$(echo "$arguments" | cut -d '?' -f2)"
+if [ -n "$cgiargs" ]; then
+    url="gemini://$(echo "$cgiargs" | cut -d '?' -f2)"
     host="$(echo "$url" | cut -d '/' -f3)"
 else
-    printf "CGI Error: \$search and \$arguments are empty\n"
-    printf "I haven't implemented selector 7 yet\n"
+    printf "CGI Error: \$cgisearch and \$cgiargs are empty\n"
     print_debug
 fi
 
