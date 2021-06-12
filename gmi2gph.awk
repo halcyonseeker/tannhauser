@@ -13,8 +13,11 @@ BEGIN {
 
             } else if (!substr($2, 0, index($2, ":"))) {  # Gemini Path
                 printf("[1|")
-                for (i = 3; i <= NF; i++)
-                    printf("%s ", $i)
+                if (NF == 2)
+                    printf("%s", $2)
+                else
+                    for (i = 3; i <= NF; i++)
+                        printf("%s ", $i)
                 printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", path, $2)
 
             } else if (substr($2, 0, 7) == "gopher:") {   # Gopher Link
@@ -43,11 +46,14 @@ BEGIN {
                 printf("|URL:%s|localhost|70]\n", $2)
 
             } else {                                      # Unspecified link
-                # TODO: what should we assume?
-                printf "UNSPECIFIED_LINK => "
-                for (i = 3; i <= NF; i++)
-                    printf $i " "
-                printf " (" $2 ")\n"
+                # Assume Gemini
+                printf("[1|")
+                if (NF == 2)
+                    printf("%s", $2)
+                else
+                    for (i = 3; i <= NF; i++)
+                        printf("%s ", $i)
+                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", path, $2)
             }
         } else {                                 # This line is not a hyperlink
             print $0
