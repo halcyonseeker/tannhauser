@@ -7,14 +7,17 @@ BEGIN {
             if (substr($2, 0, 7) == "gemini:") {          # Gemini Link
                 sub(/gemini:\/\//, "", $2)
                 printf("[1|")
-                for (i = 3; i <= NF; i++)
-                    printf("%s ", $i)
+                if (NF == 2)
+                    printf("%s\n", $2)
+                else
+                    for (i = 3; i <= NF; i++)
+                        printf("%s ", $i)
                 printf("|/tannhauser.dcgi?%s|localhost|70]\n", $2)
 
             } else if (!substr($2, 0, index($2, ":"))) {  # Gemini Path
                 printf("[1|")
                 if (NF == 2)
-                    printf("%s", $2)
+                    printf("%s\n", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -29,7 +32,7 @@ BEGIN {
 
                 printf("[%s|", gphselector)
                 if (NF == 2)
-                    printf("%s", $2)
+                    printf("%s\n", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -39,7 +42,7 @@ BEGIN {
                        (substr($2, 0, 6) == "https:")) {  # Web Link
                 printf("[h|")
                 if (NF == 2)
-                    printf("%s", $2)
+                    printf("%s\n", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -49,7 +52,7 @@ BEGIN {
                 # Assume Gemini
                 printf("[1|")
                 if (NF == 2)
-                    printf("%s", $2)
+                    printf("%s\n", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
