@@ -7,7 +7,7 @@ be accessed from any gopher browser.
 
 [gopher://tannhauser.ulthar.xyz](gopher://tannhauser.ulthar.xyz)
 
-Since M$ Github doesn't hyperlink gopher urls, here's a
+M$ Github doesn't hyperlink gopher urls, so here's a
 [floodgap link](https://gopher.floodgap.com/gopher/gw.lite?gopher://tannhauser.ulthar.xyz:70/1)
 
 ## Dependencies
@@ -22,7 +22,8 @@ Since M$ Github doesn't hyperlink gopher urls, here's a
 
 ## TODO
 + Pass torture test.
-+ Support selector 7 and Gemini response code 10
++ Support selector 7 and Gemini response code 10 for searching
 + Figure out a portable way to removing nmap as a dependency.
 + Make this script server-agnostic.
 + Wrap lines at 72 columns
++ Make sure there aren't any code-injection vulnerabilities (^_^;)
