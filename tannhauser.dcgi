@@ -12,9 +12,11 @@ print_debug() {
     [ -n "$cgiargs" ]   && printf "| (2) \$cgiargs   : %s\n" "$cgiargs"
     [ -n "$cgihost" ]   && printf "| (3) \$cgihost   : %s\n" "$cgihost"
     [ -n "$cgiport" ]   && printf "| (4) \$cgiport   : %s\n" "$cgiport"
+    printf "+----------------+\n"
     [ -n "$url" ]       && printf "| \$url           : %s\n" "$url"
     [ -n "$host" ]      && printf "| \$host          : %s\n" "$host"
     [ -n "$gatepath" ]  && printf "| \$gatepath      : %s\n" "$gatepath"
+    printf "+----------------+\n"
     [ -n "$status" ]    && printf "| \$status        : %s\n" "$status"
     [ -n "$code" ]      && printf "| \$code          : %s\n" "$code"
     [ -n "$mime" ]      && printf "| \$mime          : %s\n" "$mime"
@@ -28,16 +30,20 @@ cgihost="$3"
 cgiport="$4"
 
 # Needed to send the request and assemble working links
-if [ -n "$cgiargs" ]; then
-    url="gemini://$(echo "$cgiargs" | cut -d '?' -f2)"
-    host="$(echo "$url" | cut -d '/' -f3)"
+if [ -n "$cgiargs" ]; then      # We're following a link through the proxy
+    url="gemini://$cgiargs"
+    host="$(echo "$cgiargs" | cut -d '/' -f1)"
+    gatepath="$cgiargs"
 else
     printf "CGI Error: \$cgisearch and \$cgiargs are empty\n"
     print_debug
 fi
 
+# Make sure there's a trailing slash on naked domains
+[ ! "$(echo "$url" | cut -d '/' -f4)" ] && url="$url/"
+
 # ncat doesn't like host:port URIs
-host="${host%%:1965}"
+host="${host%%:*}"
 
 if [ -n "$url" ] && [ -n "$host" ] ; then
     printf "%s\r\n\r\n" "$url" |  ncat --ssl "$host" 1965 >/tmp/astrogate || {
@@ -49,7 +55,6 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
     status="$(head -1 /tmp/astrogate)"
     code="$(echo "$status" | cut -d ' ' -f1)"
     mime="$(echo "$status" | cut -d ' ' -f2 | tr -d ';')"
-    gatepath="${url##gemini:\/\/}"
 
     [ -z "$status" ] && {
         printf "CGI Error: gemini response (\$status line) is empty\n"
@@ -64,7 +69,7 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
         case "$mime" in
             "text/gemini")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
-                    | awk -v gatepath="$path" -v host="$host" -f ./gmi2gph.awk
+                    | awk -v path="$gatepath" -v host="$host" -f ./gmi2gph.awk
             ;;
             "text/plain")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate
@@ -73,7 +78,7 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
                 # TODO: differentiate between text for display and binary to dl
                 printf "WARNING: \$mime (%s) is something else\n" "$mime"
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
-                    | awk -v gatepath="$path" -v host="$host" -f ./gmi2gph.awk
+                    | awk -v path="$gatepath" -v host="$host" -f ./gmi2gph.awk
             ;;
         esac
     else
