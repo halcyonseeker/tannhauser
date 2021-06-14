@@ -14,7 +14,7 @@ print_debug() {
     [ -n "$port" ]      && printf "| (4) \$port      : %s\n" "$port"
     [ -n "$url" ]       && printf "| \$url           : %s\n" "$url"
     [ -n "$host" ]      && printf "| \$host          : %s\n" "$host"
-    [ -n "$path" ]      && printf "| \$path          : %s\n" "$path"
+    [ -n "$gatepath" ]  && printf "| \$gatepath      : %s\n" "$gatepath"
     [ -n "$status" ]    && printf "| \$status        : %s\n" "$status"
     [ -n "$code" ]      && printf "| \$code          : %s\n" "$code"
     [ -n "$mime" ]      && printf "| \$mime          : %s\n" "$mime"
@@ -49,7 +49,7 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
     status="$(head -1 /tmp/astrogate)"
     code="$(echo "$status" | cut -d ' ' -f1)"
     mime="$(echo "$status" | cut -d ' ' -f2 | tr -d ';')"
-    path="${url##gemini:\/\/}"
+    gatepath="${url##gemini:\/\/}"
 
     [ -z "$status" ] && {
         printf "CGI Error: gemini response (\$status line) is empty\n"
@@ -64,7 +64,7 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
         case "$mime" in
             "text/gemini")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
-                    | awk -v path="$path" -v host="$host" -f ./gmi2gph.awk
+                    | awk -v gatepath="$path" -v host="$host" -f ./gmi2gph.awk
             ;;
             "text/plain")
                 sed "s/\t/ /g; 1 d" /tmp/astrogate
@@ -73,7 +73,7 @@ if [ -n "$url" ] && [ -n "$host" ] ; then
                 # TODO: differentiate between text for display and binary to dl
                 printf "WARNING: \$mime (%s) is something else\n" "$mime"
                 sed "s/\t/ /g; 1 d" /tmp/astrogate \
-                    | awk -v path="$path" -v host="$host" -f ./gmi2gph.awk
+                    | awk -v gatepath="$path" -v host="$host" -f ./gmi2gph.awk
             ;;
         esac
     else
