@@ -47,7 +47,7 @@ BEGIN {
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
-                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", host, $2)
+                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", path, $2)
 
             } else if (substr($2, 0, 2) == "//") {        # Sans gemini:
                 sub(/\/\//, "", $2)
@@ -67,7 +67,7 @@ BEGIN {
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
-                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", host, $2)
+                printf("|/tannhauser.dcgi?%s/%s|localhost|70]\n", path, $2)
             }
         } else {                                 # This line is not a hyperlink
             print $0
