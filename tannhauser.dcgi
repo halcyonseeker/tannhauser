@@ -34,6 +34,17 @@ if [ -n "$cgiargs" ]; then      # We're following a link through the proxy
     url="gemini://$cgiargs"
     host="$(echo "$cgiargs" | cut -d '/' -f1)"
     gatepath="$cgiargs"
+elif [ -n "$cgisearch" ]; then  # Process user input
+    if [ "$(echo "$cgisearch" | cut -d '/' -f1)" = "gemini:" ]; then
+        # gemini://host.tld/path
+        url="$cgisearch"
+        host="$(echo "$cgisearch" | cut -d '/' -f3)"
+        gatepath="${cgisearch%%gemini://}"
+    else
+        url="gemini://$cgisearch"
+        host="$(echo "$cgisearch" | cut -d '/' -f1)"
+        gatepath="$cgisearch"
+    fi
 else
     printf "CGI Error: \$cgisearch and \$cgiargs are empty\n"
     print_debug
