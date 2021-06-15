@@ -1,7 +1,7 @@
 # The Tannhauser Gate
 
-A somewhat functional gopher script to allow content in geminispace to
-be accessed from any gopher browser.
+A proof-of-concept script to allow content in geminispace to be
+accessed from any gopher browser.
 
 **This site isn't live yet**
 
@@ -17,13 +17,15 @@ M$ Github doesn't hyperlink gopher urls, so here's a
 ## Known Bugs
 + **Content-type handler is screwy**. The case statement always
   defaults, even when the content-type is `text/gemini`.
-+ **Code 40 on torture test**. We're not passing any of the torture
-  tests lol.
++ **Path and URL handling parsing is brittle**. The parsing logic in
+  tannhauser.dcgi and the creation logic in gmi2gph.awk work about 90%
+  of the time, but fail for relative links in the current directory
+  and links to parent directories.
 
 ## TODO
-+ Pass torture test.
-+ Support selector 7 and Gemini response code 10 for searching
++ We don't support any kind of Gemini user input yet.
++ Pass the torture test.
 + Figure out a portable way to removing nmap as a dependency.
 + Make this script server-agnostic.
-+ Wrap lines at 72 columns
-+ Make sure there aren't any code-injection vulnerabilities (^_^;)
++ Wrap lines at 72 columns.
++ Make sure there aren't any code-injection vulnerabilities (^_^;).
