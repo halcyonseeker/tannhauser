@@ -2,13 +2,18 @@
 
 BEGIN {
     FS = " "
+
+    # Make sure path has a trailing slash
+    if (path !~ /.*\//)
+        path = sprintf("%s/", path)
+
     while (getline > 0) {
         if ($1 == "=>") {                        # This line is a hyperlink
             if (substr($2, 0, 7) == "gemini:") {          # Gemini Link
                 sub(/gemini:\/\//, "", $2)
                 printf("[1|")
                 if (NF == 2)
-                    printf("%s\n", $2)
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -23,7 +28,7 @@ BEGIN {
 
                 printf("[%s|", gphselector)
                 if (NF == 2)
-                    printf("%s\n", $2)
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -33,7 +38,7 @@ BEGIN {
                        (substr($2, 0, 6) == "https:")) {  # Web Link
                 printf("[h|")
                 if (NF == 2)
-                    printf("%s\n", $2)
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -43,17 +48,17 @@ BEGIN {
                        substr($2, 0, 2) != "//") {        # Absolute path
                 printf("[1|")
                 if (NF == 2)
-                    printf("%s\n", $2)
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
-                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", path, $2)
+                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", host, $2)
 
             } else if (substr($2, 0, 2) == "//") {        # Sans gemini:
                 sub(/\/\//, "", $2)
                 printf("[1|")
                 if (NF == 2)
-                    printf("%s\n", $2)
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
@@ -63,11 +68,11 @@ BEGIN {
                 # Assume a relative path
                 printf("[1|")
                 if (NF == 2)
-                    printf("%s\n", $2)
+                    printf("%s", $2)
                 else
                     for (i = 3; i <= NF; i++)
                         printf("%s ", $i)
-                printf("|/tannhauser.dcgi?%s/%s|localhost|70]\n", path, $2)
+                printf("|/tannhauser.dcgi?%s%s|localhost|70]\n", path, $2)
             }
         } else {                                 # This line is not a hyperlink
             print $0
